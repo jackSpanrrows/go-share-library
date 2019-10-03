@@ -1,4 +1,4 @@
-package Download
+package downloader
 
 // DJradio 主播电台类型
 type DJradio struct {
