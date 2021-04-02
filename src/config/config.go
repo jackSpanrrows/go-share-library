@@ -1,5 +1,6 @@
 package config
 import (
+	"strings"
 	"time"
 )
 
@@ -36,4 +37,37 @@ func loadFile(config *Config) {
  */
 func (config *Config) autoLoadConfig() {
 
+}
+
+// 获取字符串型的配置
+func (config *Config) GetStrConfig(section string, key string, def string, value *string) bool {
+	
+	var configVal = def
+	var isExists = false
+	if len(config.config[section]) > 0 {
+		if len(config.config[section][key]) > 0 {
+			configVal = config.config[section][key]
+			isExists = true
+		}
+	}
+	
+	if !isExists {
+		// 配置不存在，尝试从环境变量中获取
+		envConfig := os.Getenv(strings.ToUpper(section + "_" + key))
+		if envConfig != "" {
+			configVal = envConfig
+			isExists = true
+		}
+	}
+	
+	if config.autoLoad > 0 && isExists {
+		config.stringMap[section+":"+key] = autoLoadString{
+			section: section,
+			key: key,
+			def: def,
+			value: value,
+		}
+	}
+	*value = configVal
+	return isExists
 }
